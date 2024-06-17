@@ -26,14 +26,14 @@ public class Player extends Entity{
         screeny = (gp.screenHeight / 2) - (gp.tileSize /2);
 
         //solid area of the character
-        solidArea = new Rectangle(29, 58, 38, 38);
+        solidArea = new Rectangle(0, 58, 40, 38);
 
         setDefaultValues();
         getPlayerImage();
     }
     public void setDefaultValues() {
-        worldx = gp.tileSize * 6;
-        worldy = gp.tileSize * 3;
+        worldx = gp.tileSize * 9;
+        worldy = gp.tileSize * 6;
         speed = 3;
         direction = "down";
     }
@@ -51,6 +51,7 @@ public class Player extends Entity{
             e.printStackTrace();
         }
     }
+
     public void update() {
 
         if (kh.upPressed || kh.downPressed || kh.leftPressed || kh.rightPressed) {
@@ -71,7 +72,7 @@ public class Player extends Entity{
             //collision
             collisionOn = false;
             //player is subclass of entity so can be recieved as ent.
-            gp.checker.checkTile(this);
+            gp.checker.checkCollision(this, gp.allies);
 
             //if col is false player can move
             if (collisionOn == false) {

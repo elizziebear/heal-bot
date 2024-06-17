@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.beans.Encoder;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import entity.Ally;
 import entity.Player;
 import tile.tileManager;
 
@@ -23,8 +26,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenHeight = tileSize * maxScreenRow;
 
     //world settings
-    public final int maxWorldCol = 14;
-    public final int maxWorldRow = 8;
+    public final int maxWorldCol = 19;
+    public final int maxWorldRow = 13;
     //cant do more than 14 vertically
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
@@ -39,7 +42,10 @@ public class GamePanel extends JPanel implements Runnable {
 
     public CollisionChecker checker = new CollisionChecker(this);
 
+    //player and allies
     public Player player= new Player(this, kh);
+
+    public ArrayList<Ally> allies = new ArrayList<Ally>();
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -47,6 +53,11 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(kh);
         this.setFocusable(true);
+
+        //set allies
+        allies.add(new Ally(this, 700, 500));
+        allies.add(new Ally(this, 900, 450));
+        allies.add(new Ally(this, 1100, 700));
     }
 
     public void startGameThread() {
@@ -93,6 +104,9 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D)g;
 
         tileM.draw(g2);
+        for (Ally ally : allies) {
+            ally.draw(g2);
+        }
         player.draw(g2);
 
         g2.dispose();

@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+
+import entity.Ally;
 import entity.Entity;
 
 public class CollisionChecker {
@@ -10,7 +13,7 @@ public class CollisionChecker {
         this.gp = gp;
     }
 
-    public void checkTile(Entity entity) {
+    public void checkCollision(Entity entity, ArrayList<Ally> allies) {
         int entityLeftWorldX = entity.worldx + entity.solidArea.x;
         int entityRightWorldX = entity.worldx + entity.solidArea.x + entity.solidArea.width;
         int entityTopWorldY = entity.worldy + entity.solidArea.y;
@@ -20,6 +23,44 @@ public class CollisionChecker {
         int entityRightCol = entityRightWorldX / gp.tileSize;
         int entityTopRow = entityTopWorldY / gp.tileSize;
         int entityBotRow = entityBotWorldY / gp.tileSize;
+
+        //ally check
+        for (Ally ally : allies) {
+            switch(entity.direction) {
+                case "up":
+                    if ((entityTopWorldY <= (ally.worldy + ally.solidArea.height)) && (entityBotWorldY > ally.worldy + ally.solidArea.height)) {
+                        if((ally.worldx < entityLeftWorldX && entityLeftWorldX < ally.worldx + ally.solidArea.width) || (ally.worldx < entityRightWorldX && entityRightWorldX < ally.worldx + ally.solidArea.width)) {
+                            entity.collisionOn = true;
+                        }   
+                    }
+
+                    break;
+        
+                case "down":
+                    if ((entityBotWorldY >= (ally.worldy)) && (entityTopWorldY < ally.worldy)) {
+                        if((ally.worldx < entityLeftWorldX && entityLeftWorldX < ally.worldx + ally.solidArea.width) || (ally.worldx < entityRightWorldX && entityRightWorldX < ally.worldx + ally.solidArea.width)) {
+                            entity.collisionOn = true;
+                        }   
+                    }
+                    break;
+        
+                case "left":
+                    if ((entityLeftWorldX <= (ally.worldx + ally.solidArea.width)) && (entityRightWorldX > ally.worldx)) {
+                        if((ally.worldy < entityTopWorldY && entityTopWorldY < ally.worldy + ally.solidArea.height) || (ally.worldy < entityBotWorldY && entityBotWorldY < ally.worldy + ally.solidArea.height)) {
+                            entity.collisionOn = true;
+                        }   
+                    }
+                    break;
+        
+                case "right":
+                    if ((entityRightWorldX >= (ally.worldx)) && (entityLeftWorldX < ally.worldx)) {
+                        if((ally.worldy < entityTopWorldY && entityTopWorldY < ally.worldy + ally.solidArea.height) || (ally.worldy < entityBotWorldY && entityBotWorldY < ally.worldy + ally.solidArea.height)) {
+                            entity.collisionOn = true;
+                        }   
+                    }
+                     break;
+            }
+        }
 
         //tiles checked (player right and left shoulder)
         int tileNum1, tileNum2;
