@@ -5,8 +5,14 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.beans.Encoder;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import entity.Ally;
@@ -17,6 +23,8 @@ public class GamePanel extends JPanel implements Runnable {
     //screen settings
     final int originalTileSize = 96; //revert 1920
     final int scale = 1; //revert 0.05 ... double
+
+    boolean gameOver = false;
 
     //actual tile size
     public final int tileSize = originalTileSize * scale; //revert originalTileSize * scale ... cast to int
@@ -74,17 +82,68 @@ public class GamePanel extends JPanel implements Runnable {
         double nextHealthTime = System.nanoTime() + healthInterval;
         double nextDrawTime = System.nanoTime() + drawInterval; 
 
-        while(gameThread != null) {
+        double gameStart = System.nanoTime();
+
+        while(gameThread != null && gameOver == false) {
             //update char position
             update();
             //draw screen with updated info
             repaint(); //this is how you call paintComponent (built in)
 
             if (System.nanoTime() > nextHealthTime) {
+                int countAllies = 0;
                 for (Ally ally : allies) {
                     if (ally.life > 0) {
                         ally.life -= 1;
+
+                        if (ally.life > 0) {
+                            countAllies += 1;
+                        }
                     }
+                }
+
+                if (countAllies == 0) {
+                    double gameLength = System.nanoTime() - gameStart;
+                    double gameSeconds = gameLength / 1000000000.00;
+                    double gameMinutes = gameSeconds / 60;
+                    gameOver = true;
+                    Main.gameOver();
+
+
+                    String path = (System.getProperty("user.dir") + "\\highScore.txt");
+                    File file = new File(path);
+
+                    String lastHighScore = "0";
+
+                    if (file.exists()) {
+                        Scanner reader;
+                        try {
+                            //read from file and store the top three scores
+                            reader = new Scanner(file);
+                            if (reader.hasNext()) {
+                                lastHighScore = reader.nextLine();
+                            }
+                            reader.close();
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+
+                    if (lastHighScore == null || gameMinutes > Double.parseDouble(lastHighScore)) {
+                        lastHighScore = String.valueOf(gameMinutes);
+                    }
+
+                    String scoreData = lastHighScore;
+                    File scoreFile = new File(path);
+
+                    try {
+                        FileWriter f2 = new FileWriter(scoreFile, false);
+                        f2.write(scoreData);
+                        f2.close();
+                        System.out.println(lastHighScore);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                        }
                 }
                 nextHealthTime = System.nanoTime()+healthInterval;
             }
