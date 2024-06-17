@@ -54,6 +54,25 @@ public class Player extends Entity{
 
     public void update() {
 
+        int entityLeftWorldX = worldx + solidArea.x;
+        int entityRightWorldX = worldx + solidArea.x + solidArea.width;
+        int entityTopWorldY = worldy + solidArea.y;
+        int entityBotWorldY = worldy + solidArea.y + solidArea.height;
+
+        if (kh.healPresses > 0) {
+                for (Ally ally : gp.allies) {
+                    if (Math.abs(((worldx + (solidArea.width) / 2) - ally.worldx + (ally.solidArea.width / 2))) < 100) {
+                        if (Math.abs(((worldy + (solidArea.height) / 2) - ally.worldy + (ally.solidArea.height / 2))) < 100) {
+                            if (ally.life < ally.maxLife) {
+                                ally.life += 1;
+                            }
+                        }
+                    }
+            }
+            kh.healPresses = 0;
+        }
+
+
         if (kh.upPressed || kh.downPressed || kh.leftPressed || kh.rightPressed) {
             //update position
             if(kh.upPressed == true) {

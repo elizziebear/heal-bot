@@ -69,6 +69,9 @@ public class GamePanel extends JPanel implements Runnable {
     public void run() {
 
         double drawInterval = 1000000000/FPS; //0.016666 seconds
+        double healthInterval = drawInterval * 100;
+
+        double nextHealthTime = System.nanoTime() + healthInterval;
         double nextDrawTime = System.nanoTime() + drawInterval; 
 
         while(gameThread != null) {
@@ -77,6 +80,14 @@ public class GamePanel extends JPanel implements Runnable {
             //draw screen with updated info
             repaint(); //this is how you call paintComponent (built in)
 
+            if (System.nanoTime() > nextHealthTime) {
+                for (Ally ally : allies) {
+                    if (ally.life > 0) {
+                        ally.life -= 1;
+                    }
+                }
+                nextHealthTime = System.nanoTime()+healthInterval;
+            }
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
                 remainingTime = remainingTime/1000000;
@@ -105,7 +116,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         tileM.draw(g2);
         for (Ally ally : allies) {
-            ally.draw(g2);
+            if (ally.life > 0) {
+                ally.draw(g2);
+            }
         }
         player.draw(g2);
 
